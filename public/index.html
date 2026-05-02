@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HKS Bank & Co.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <!-- Login Screen -->
+    <div id="loginView" class="auth-wrapper">
+        <div class="auth-container">
+            <div class="auth-left">
+                <h2>Sign in</h2>
+                <form id="loginForm">
+                    <input type="text" id="accountNo" placeholder="Account Number (1001)" autocomplete="off" required>
+                    <input type="password" id="pin" placeholder="PIN (1234)" autocomplete="new-password" required>
+                    <button type="submit" class="btn-auth">Authenticate</button>
+                </form>
+            </div>
+            <div class="auth-right">
+                <div class="brand-box">
+                    <h1>HKS</h1>
+                    <p>BANK & CO.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardView" class="dashboard-layout hidden">
+        
+        <!-- SIDEBAR (Matched to your screenshot exactly) -->
+        <aside class="sidebar">
+            <div class="sidebar-head">
+                <div class="logo-circle">BH</div>
+                <h3>HKS Bank & Co.</h3>
+            </div>
+            <button class="btn-primary-action" onclick="openTransferModal()">Transfer money</button>
+            
+            <nav class="side-nav">
+                <a href="#" class="nav-item active" onclick="switchTab('overview', this)">Dashboard</a>
+                <a href="#" class="nav-item" onclick="switchTab('cards', this)">Cards</a>
+                <a href="#" class="nav-item" onclick="switchTab('subscriptions', this)">Subscriptions</a>
+                <a href="#" class="nav-item" onclick="loadTransactions(this)">Transactions</a>
+                <a href="#" class="nav-item" onclick="switchTab('loans', this)">Loans</a>
+                <a href="#" class="nav-item" onclick="switchTab('support', this)">Support</a>
+            </nav>
+
+            <div class="pro-upsell">
+                <p>Start saving!</p>
+                <a href="#">Upgrade to PRO</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <!-- TAB 1: OVERVIEW -->
+            <div id="overview" class="view-panel">
+                <header class="content-header">
+                    <h1>Overview</h1>
+                    <div class="header-tools">
+                        <span class="bell">🔔</span>
+                        <div class="user-avatar" id="navAvatar">H</div>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="card visa-card">
+                        <div class="card-top"><span>Pay</span><span class="apple-pay"> Pay</span></div>
+                        <div class="card-mid">•••• •••• •••• <span id="cardID">1001</span></div>
+                        <div class="card-bottom">
+                            <div><small>VALID THRU</small><p>05/27</p></div>
+                            <div><small>CARD HOLDER</small><p id="cardName">HKS</p></div>
+                        </div>
+                    </div>
+
+                    <div class="card networth-card">
+                        <h3>Networth</h3>
+                        <h2 id="mainBalance">$0.00</h2>
+                        <div class="stats-breakdown">
+                            <div><small>Balance</small><p class="c-purple" id="statBalance">$0.00</p></div>
+                            <div><small>Investments</small><p class="c-green">$10,05,442</p></div>
+                            <div><small>Credit Utilized</small><p class="c-red">$70,000</p></div>
+                        </div>
+                    </div>
+
+                    <div class="card chart-box">
+                        <h3>Credit Usage</h3>
+                        <div class="chart-wrap-donut"><canvas id="donutChart"></canvas></div>
+                    </div>
+
+                    <div class="card chart-box">
+                        <h3>Spending Insights</h3>
+                        <div class="chart-wrap-bar"><canvas id="barChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: CARDS -->
+            <div id="cards" class="view-panel hidden">
+                <h1>Cards</h1>
+                <div class="card"><p>Your active physical and virtual cards will appear here.</p></div>
+            </div>
+
+            <!-- TAB 3: SUBSCRIPTIONS -->
+            <div id="subscriptions" class="view-panel hidden">
+                <h1>Subscriptions</h1>
+                <div class="card"><p>Manage your recurring payments (Netflix, Spotify, etc.) here.</p></div>
+            </div>
+
+            <!-- TAB 4: TRANSACTIONS -->
+            <div id="transactions" class="view-panel hidden">
+                <h1>Transactions</h1>
+                <div class="card table-card">
+                    <table id="txTable">
+                        <thead><tr><th>Date</th><th>From</th><th>To</th><th>Amount</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 5: LOANS -->
+            <div id="loans" class="view-panel hidden">
+                <h1>Loans</h1>
+                <div class="card"><p>Active loan balances and EMI schedules.</p></div>
+            </div>
+
+            <!-- TAB 6: SUPPORT -->
+            <div id="support" class="view-panel hidden">
+                <h1>Support</h1>
+                <div class="card"><p>Contact our 24/7 enterprise support team.</p></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div id="transferModal" class="modal hidden">
+        <div class="modal-box card">
+            <h3>Initiate Transfer</h3>
+            <form id="transferForm">
+                <select id="receiverId" required></select>
+                <input type="number" id="amount" placeholder="Amount ($)" required>
+                <div class="modal-btns">
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-auth">Execute Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
