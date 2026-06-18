@@ -4,7 +4,7 @@ A high-fidelity, interactive **Single Page Application (SPA)** banking portal de
 
 This project provides a technical deep-dive into how **MySQL Stored Procedures** and **row-level locking** can be used to build a secure, transactionally integral financial system that prevents data corruption in high-frequency environments.
 
-## 🎯 About The Project
+## About The Project
 
 This project simulates a secure retail banking environment where data integrity is the highest priority:
 
@@ -12,7 +12,7 @@ This project simulates a secure retail banking environment where data integrity 
 
 HKS Bank & Co. solves this by implementing an architecture that moves critical logic from the application layer into the database layer, ensuring every transaction is atomic and isolated.
 
-## ✨ Features
+## Features
 
 *   **Atomic Fund Transfers:** Leverages **MySQL Stored Procedures** to ensure that a transfer (Deduct -> Add -> Audit Log) either completes entirely or fails as a single unit.
 *   **Race Condition Prevention:** Implements **`FOR UPDATE` row-level locking**. Watch the system queue concurrent requests to prevent balance corruption.
@@ -20,7 +20,7 @@ HKS Bank & Co. solves this by implementing an architecture that moves critical l
 *   **Bento-Grid Dashboard:** A real-time UI featuring financial visualization via **Chart.js** and secure audit logging.
 *   **Data Isolation:** RESTful API endpoints filter sensitive transaction data based on the authenticated user's ID.
 
-## 💡 The Engineering Logic Explained
+## The Engineering Logic Explained
 
 ### 1. The Challenge: Concurrency
 If two processes read a balance of **$1000** simultaneously and both try to withdraw **$600**, a standard `UPDATE` query might allow both, leaving the account at **-$200**.
@@ -39,7 +39,7 @@ By wrapping our SQL logic in `START TRANSACTION` and `ROLLBACK` protocols, we gu
 *   **Isolation:** Transactions do not interfere with each other.
 *   **Durability:** Committed data is permanent, even during a server crash.
 
-## 🚀 Getting Started
+## Getting Started
 
 To get a local copy of this enterprise architecture running, follow these steps.
 
@@ -62,16 +62,16 @@ To get a local copy of this enterprise architecture running, follow these steps.
     npm start
     ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 *   **Node.js & Express.js:** For the asynchronous, non-blocking API gateway.
 *   **MySQL:** For relational data integrity and ACID-compliant Stored Procedures.
 *   **JavaScript (ES6+):** For the custom SPA router and client-side state management.
 *   **Chart.js:** For rendering real-time financial data visualizations.
 
-## 🖼️ Demo
+## Demo
 
-![gif of the HKS Bank Demo](b6gif.gif)
+![gif of the HKS Bank Demo](demo.gif)
 
 ---
 

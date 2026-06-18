@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <title>HKS Bank & Co.</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="toast-container"></div>
 
-    <!-- Login Screen -->
+    <!-- /**
+     * AUTHENTICATION PORTAL VIEW: Isolated entry component wrapper.
+     * TRAP MITIGATION: `autocomplete="off"` and `autocomplete="new-password"` are explicitly injected
+     * into input properties to force modern desktop engines to discard local cache histories, 
+     * preventing messy browser dropdown overlays and securing presentation recording runs.
+     */ -->
     <div id="loginView" class="auth-wrapper">
         <div class="auth-container">
             <div class="auth-left">
@@ -30,10 +36,13 @@
         </div>
     </div>
 
-    <!-- Main Dashboard -->
+    <!-- /**
+     * DASHBOARD WORKSPACE WIREFRAME: Core operational application frame layout.
+     * INTERVIEW FOCUS: Utilizes a default `.hidden` class to act as a strict visibility state guard. 
+     * Prevents browser layout rendering of user dashboards until asynchronous authentication validation triggers.
+     */ -->
     <div id="dashboardView" class="dashboard-layout hidden">
         
-        <!-- SIDEBAR (Matched to your screenshot exactly) -->
         <aside class="sidebar">
             <div class="sidebar-head">
                 <div class="logo-circle">BH</div>
@@ -58,7 +67,11 @@
 
         <main class="main-content">
             
-            <!-- TAB 1: OVERVIEW -->
+            <!-- /**
+             * VIEW TAB 1: OVERVIEW METRICS.
+             * Renders a real-time bento-grid layout containing user financial status tokens.
+             * `mainBalance`: Target inner-text identifier for client-side currency state injection.
+             */ -->
             <div id="overview" class="view-panel">
                 <header class="content-header">
                     <h1>Overview</h1>
@@ -100,19 +113,21 @@
                 </div>
             </div>
 
-            <!-- TAB 2: CARDS -->
             <div id="cards" class="view-panel hidden">
                 <h1>Cards</h1>
                 <div class="card"><p>Your active physical and virtual cards will appear here.</p></div>
             </div>
 
-            <!-- TAB 3: SUBSCRIPTIONS -->
             <div id="subscriptions" class="view-panel hidden">
                 <h1>Subscriptions</h1>
                 <div class="card"><p>Manage your recurring payments (Netflix, Spotify, etc.) here.</p></div>
             </div>
 
-            <!-- TAB 4: TRANSACTIONS -->
+            <!-- /**
+             * VIEW TAB 4: HISTORICAL LEDGER INTERFACE.
+             * Displays an internal data loop component populated by asynchronous REST requests.
+             * Enforces strict data isolation on backend retrieval routines to verify payload origin parameters.
+             */ -->
             <div id="transactions" class="view-panel hidden">
                 <h1>Transactions</h1>
                 <div class="card table-card">
@@ -123,13 +138,11 @@
                 </div>
             </div>
 
-            <!-- TAB 5: LOANS -->
             <div id="loans" class="view-panel hidden">
                 <h1>Loans</h1>
                 <div class="card"><p>Active loan balances and EMI schedules.</p></div>
             </div>
 
-            <!-- TAB 6: SUPPORT -->
             <div id="support" class="view-panel hidden">
                 <h1>Support</h1>
                 <div class="card"><p>Contact our 24/7 enterprise support team.</p></div>
@@ -138,7 +151,11 @@
         </main>
     </div>
 
-    <!-- Transfer Modal -->
+    <!-- /**
+     * DYNAMIC DIALOGUE WINDOW: Transactional Capital Transfer Modal.
+     * Placed at a high stacking context (`z-index: 1000`) to grab full viewport interaction control.
+     * Drops selection entries straight down into a script logic wrapper to safely run Stored Procedures.
+     */ -->
     <div id="transferModal" class="modal hidden">
         <div class="modal-box card">
             <h3>Initiate Transfer</h3>

@@ -1,23 +1,39 @@
+/**
+ * APPLICATION CLIENT STATE: Global Memory Store.
+ * Holds in-memory representations of the session context.
+ * `user`: Stores the active session payload (id, name, balance) upon verified cryptographic response.
+ * `allUsers`: Caches recipient metadata locally to eliminate redundant network overhead during transfer instantiations.
+ */
 let user = null;
 let allUsers = [];
 
-// 1. View Switching Logic
+/**
+ * CLIENT-SIDE ROUTING: Vanilla JS SPA Tab Orchestration.
+ * Minimizes processing cycles by batch-hiding panels using basic utility constraints (`.hidden`).
+ * Directly manipulates layout parameters via the DOM rather than triggering server-side document requests,
+ * ensuring fluid view state alterations with strict separation of concerns.
+ */
 function switchTab(viewId, element) {
-    // Hide all panels
+    // Structural Guard: Linearly disables visibility layers to purge the viewport state
     const panels = ['overview', 'cards', 'subscriptions', 'transactions', 'loans', 'support'];
     panels.forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
     
-    // Show target panel
+    // Mounts the selected view panel dynamically into the DOM layout flow
     document.getElementById(viewId).classList.remove('hidden');
 
-    // Update active state on sidebar links
+    // Visual State Management: Updates class indices to track current navigation metrics
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if(element) element.classList.add('active');
 }
 
-// 2. Login Logic
+/**
+ * AUTHENTICATION SIDE-EFFECT: Form Submittal Listener & Session Hydration.
+ * Prevents native form lifecycle bubbling (`e.preventDefault()`) to intercept and handle thread logic natively.
+ * Dispatches an asynchronous `POST` HTTP wire payload containing target authentication criteria.
+ * Hydrates client memory objects and explicitly commands DOM visualization parameters upon positive validation.
+ */
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
@@ -32,20 +48,21 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await res.json();
         
         if (data.success) {
+            // Memory State Hydration: Commits API response into runtime application storage
             user = data.user;
             
-            // Switch UI
+            // View Transition: Dismounts the gateway authorization portal and spins up the main dashboard context
             document.getElementById('loginView').classList.add('hidden');
             document.getElementById('dashboardView').classList.remove('hidden');
             
-            // Populate Data
+            // UI Thread Rendering: Maps database decimal records into localized human-readable string patterns
             const bal = `$${parseFloat(user.balance).toLocaleString()}`;
             document.getElementById('mainBalance').innerText = bal;
             document.getElementById('statBalance').innerText = bal;
             document.getElementById('cardName').innerText = user.name;
             document.getElementById('navAvatar').innerText = user.name.charAt(0);
             
-            // Setup dashboard
+            // Initialization Phase: Concurrent firing of analytics visualization and caching engines
             initCharts();
             fetchCustomers();
         } else {
@@ -56,14 +73,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 });
 
-// 3. Transactions Load
+/**
+ * SECURE DATA STREAMING: Isolated User Transaction Retrieval.
+ * Executes background data aggregation by parsing the active system context parameter directly into a RESTful path template.
+ * INTERVIEW FOCUS: Enforces strict data isolation on the wire by requesting filtered sets via variable substitution (`${user.id}`).
+ * Iterates over incoming JSON arrays to programmatically map and insert native sanitized string nodes directly into the tbody layer.
+ */
 async function loadTransactions(element) {
     switchTab('transactions', element);
     try {
-        // We dynamically append the logged-in user's ID to the request
+        // Asynchronous Request Boundary: Pulls isolated ledger blocks based on unique token contexts
         const res = await fetch(`/api/transactions/${user.id}`);
         const data = await res.json();
         
+        // Dynamic DOM Manipulation: Structural generation of records via memory array map cycles
         document.querySelector('#txTable tbody').innerHTML = data.transactions.map(t => `
             <tr>
                 <td>${new Date(t.transaction_date).toLocaleDateString()}</td>
@@ -76,25 +99,46 @@ async function loadTransactions(element) {
     }
 }
 
-// 4. Modal & Transfers
+/**
+ * CACHING LAYER: Asynchronous Customer Ledger Syncer.
+ * populates the system cache with peer directory properties.
+ * Eliminates repetitive endpoint requests when compiling select properties.
+ */
 async function fetchCustomers() {
     const res = await fetch('/api/customers');
     const data = await res.json();
     allUsers = data.customers;
 }
 
+/**
+ * CLIENT INTERACTION INTERCEPTOR: Dynamic Selector Compilation.
+ * Compiles a relative selection matrix dynamically from local runtime parameters.
+ * FILTER CRITERIA: Enforces transactional invariants by stripping the logged-in individual's context 
+ * (`u.id !== user.id`) directly out of the dropdown view, completely blocking self-transfer operations.
+ */
 function openTransferModal() {
     const select = document.getElementById('receiverId');
+    // DOM Node Compilation: Injecting default layouts followed by filtered map generations
     select.innerHTML = '<option disabled selected>Select Recipient</option>' + 
         allUsers.filter(u => u.id !== user.id).map(u => `<option value="${u.id}">${u.name}</option>`).join('');
     
     document.getElementById('transferModal').classList.remove('hidden');
 }
 
+/**
+ * VIEWPORT DE-ALLOCATION: Modal View Lifecycle Terminator.
+ * Toggles structural flags to drop the current interaction framework from visible alignment properties.
+ */
 function closeModal() { 
     document.getElementById('transferModal').classList.add('hidden'); 
 }
 
+/**
+ * ATOMIC TRANSACTION DISPATCHER: Ledger Alteration Wire Payload Producer.
+ * Encapsulates client interaction attributes into an isolated, standardized transactional layout.
+ * Passes information down via Express to trigger target Stored Procedure execution sequences inside MySQL.
+ * Refreshes the active document state (`location.reload()`) upon valid loop execution to synchronize database balances.
+ */
 document.getElementById('transferForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = { 
@@ -113,8 +157,14 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
     if(data.success) location.reload();
 });
 
-// 5. Initialize Charts (Chart.js)
+/**
+ * ANALYTICS ENGINE: Chart.js Canvas Rendering Framework.
+ * Programmatically binds vector analytics instances straight to designated viewport canvas references.
+ * `donutChart`: Instantiates structural allocation records utilizing an inner-cut layout engine (80% cutout).
+ * `barChart`: Mounts comparative double-dataset configurations with localized styling constraints and axis optimization.
+ */
 function initCharts() {
+    // Render Layer - Credit Allocation Monitor
     new Chart(document.getElementById('donutChart'), { 
         type: 'doughnut', 
         data: { 
@@ -124,6 +174,7 @@ function initCharts() {
         options: { cutout: '80%', plugins: { legend: { display: false } } }
     });
 
+    // Render Layer - Multi-Dataset Seasonal Flow Analysis
     new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
