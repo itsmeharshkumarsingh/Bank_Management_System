@@ -1,7 +1,13 @@
 import express from 'express';
-import mysql from 'mysql2/promise';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+/**
+ * ARCHITECTURAL FIX: Modular Singleton Injection
+ * Imports the globally frozen database singleton instance instead of spinning up a separate 
+ * unencrypted connection configuration local to this file.
+ */
+import dbInstance from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -16,29 +22,16 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**
- * DATA PERSISTENCE: Establishes a connection pool to the MySQL relational database.
- * Uses connection pooling (Limit: 10) to efficiently manage concurrent queries and prevent
- * connection overhead bottlenecks under high-frequency trading simulations.
- */
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'Nitrr@619', 
-    database: 'hks_bank_admin',
-    waitForConnections: true,
-    connectionLimit: 10
-});
-
-/**
  * AUTHENTICATION ENDPOINT: Validates user credentials against the relational schema.
- * TRAP MITIGATION: Implements parameterized queries to completely neutralize SQL Injection (SQLi) vectors.
- * PRODUCTION UPGRADE: Plane-text PIN validation should be migrated to cryptographically salted bcrypt hashes 
+ * TRAP MITIGATION: Implements parameterized queries via the singleton layer to completely neutralize SQL Injection (SQLi) vectors.
+ * PRODUCTION UPGRADE: Plain-text PIN validation should be migrated to cryptographically salted bcrypt hashes 
  * combined with stateless JWT (JSON Web Tokens) or HttpOnly cookie sessions.
  */
 app.post('/api/login', async (req, res) => {
     const { accountNo, pin } = req.body;
     try {
-        const [rows] = await pool.query('SELECT id, name, balance FROM customers WHERE account_no = ? AND pin = ?', [accountNo, pin]);
+        // SWAPPED: Utilizing the secure dbInstance layer
+        const rows = await dbInstance.query('SELECT id, name, balance FROM customers WHERE account_no = ? AND pin = ?', [accountNo, pin]);
         if (rows.length > 0) res.json({ success: true, user: rows[0] });
         else res.status(401).json({ success: false, message: "Invalid credentials" });
     } catch (err) { res.status(500).json({ success: false, message: "Database error" }); }
@@ -51,14 +44,15 @@ app.post('/api/login', async (req, res) => {
  */
 app.get('/api/customers', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, name, account_no FROM customers');
+        // SWAPPED: Running query over the secure TLS cloud singleton instance
+        const rows = await dbInstance.query('SELECT id, name, account_no FROM customers');
         res.json({ success: true, customers: rows });
     } catch (err) { res.status(500).json({ success: false, message: "DB Error" }); }
 });
 
 /**
  * DATA ISOLATION ENFORCEMENT: Enforces strict data isolation policies at the API layer.
- * Replaced the global admin audit log query with a targetted `WHERE` condition checking both 
+ * Replaced the global admin audit log query with a targeted `WHERE` condition checking both 
  * `sender_id` and `receiver_id` matches against the authenticated user's ID. 
  * Prevents horizontal privilege escalation and ensures client-specific payload safety.
  */
@@ -73,7 +67,8 @@ app.get('/api/transactions/:userId', async (req, res) => {
             WHERE t.sender_id = ? OR t.receiver_id = ? 
             ORDER BY t.transaction_date DESC`;
             
-        const [rows] = await pool.query(query, [userId, userId]);
+        // SWAPPED: Execution bound to database connection proxy singleton
+        const rows = await dbInstance.query(query, [userId, userId]);
         res.json({ success: true, transactions: rows });
     } catch (err) { 
         res.status(500).json({ success: false, message: "DB Error" }); 
@@ -89,15 +84,23 @@ app.get('/api/transactions/:userId', async (req, res) => {
 app.post('/api/transfer', async (req, res) => {
     const { senderId, receiverId, amount } = req.body;
     try {
-        const [result] = await pool.query('CALL TransferMoney(?, ?, ?)', [senderId, receiverId, amount]);
+        // SWAPPED: Invoking Stored Procedure call dynamically over active cloud connections
+        const result = await dbInstance.query('CALL TransferMoney(?, ?, ?)', [senderId, receiverId, amount]);
         const status = result[0][0].status;
         res.json({ success: status.includes('Successful'), message: status });
     } catch (err) { res.status(500).json({ success: false, message: "Server Error" }); }
 });
 
 /**
- * HTTP APPLICATION SERVER: Launches the API Gateway on port 3000.
+ * PORT DYNAMICIZATION UPGRADE: Dynamic Environment Binding
+ * Ingests the `process.env.PORT` variable assigned by Render container systems.
+ * If running locally, it defaults seamlessly to port 3000 to prevent local architecture breaking.
+ */
+const PORT = process.env.PORT || 3000;
+
+/**
+ * HTTP APPLICATION SERVER: Launches the API Gateway.
  * Operates on the Node.js single-threaded Event Loop, utilizing asynchronous, non-blocking 
  * libuv thread pool execution to handle high-concurrency requests smoothly.
  */
-app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
